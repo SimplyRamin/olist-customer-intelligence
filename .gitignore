@@ -180,6 +180,4 @@ cython_debug/
 .cursorignore
 .cursorindexingignore
 
-*.duckdb
-*.db
 mlruns/
