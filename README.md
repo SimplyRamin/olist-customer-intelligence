@@ -12,14 +12,18 @@ Olist is a Brazilian e-commerce marketplace platform that helps small retailers 
 
 # Projects Overview
 ### 01 - Churn Prediction (`notebooks/01_churn_prediction.ipynb`)
-Built a Random Forest classifier to predict customer churn using feature engineering across 5 tables in DuckDb. Discovered data leakage and ultimately concluded that the traditional churn prediction model is not good approach for the Olist, because of the fact that the business revolves around one time buyers, and not keeping the customers for the long run.
+Built Random Forest and XGBoost classifiers to predict customer churn using feature engineering across 5 tables in DuckDB. Initial models achieved ROC-AUC of 0.53 due to insufficient features. After engineering 4 additional behavioral sugnals (delivery delay, freight ratio, late delivery rate, purchase day of week), performance improved to ROC-AUC 0.706 (Random Forest) and 0.767 (XGBoost). SHAP analysis revealed delivery experience as the strongest churn predictor.
 ### 02 - Customer Segmentation (`notebooks/02_customer_segmentation.ipynb`)
 Applied RFM analysis and KMeans clustering to segment 93,358 customers. KMeans found mathematically valid clusters but since the data was in a way that clear segmentation was not compatible with the business model, I chose to pursue a manual RFM scoring.
 
 # Key Findings
 ## Churn Analysis Findings:
-Initial ROC-AUC was 1.0, This revealed data leakage from `recency_days` (Because churn label derived directly from it). After I fixed the leakage, ROC-AUC dropped to 0.53, which was barely above random. The root cause was the 0.69% year-over-year retention rate. The median customer returns within 28 days, but 90% never return at all. In the end, Traditional churn modeling is not appropriate for this business model.
-
+- Initial models achieved ROC-AUC of 0.53, barely above random guessing
+- Root cause: insufficient behavioral features, not algorithm choice
+- After engineering delivery delay, freight ratio and purchase behavior features, ROC-AUC improved to 0.706 (RF) and 0.767 (XGBoost)
+- SHAP analysis identified avg_delivery_delay_days as the strongest churn predictor, late deliveries significantly increase chrun probability
+- Random Forest outperforms XGBoost for identifying loyal customers (class 0 recall 0.46 vs 0.06) despite lower ROC-Auc
+- 0.69% year-over-year retention rate confirms single-purchase marketplace nature, modest model performance reflects geniune data limitations, not modeling failure
 ## Segmentation findings
 KMeans silhouette score was 0.37. Pure RFM clustering found mathematical clusters but identical business profiles, so there was no meaningful separation. Fell back to manual RFM scoring which produced 4 actionable segments. The following table is the RFM Segments we found:
 
@@ -31,6 +35,7 @@ KMeans silhouette score was 0.37. Pure RFM clustering found mathematical cluster
 |At Risk|19%        |443 days   |1.00      |$57      |
 
 # Business Recommendations
+- From Shap analysis: Delivery experience is the strongest predictor of customer retention. Sellers should prioritize on-time delivery over discounting strategies.
 - From churn: Olist's data model can't support traditional churn prediction. Recommend tracking customers across sessions, not just transactions.
 - From segmentation: Focus marketing investment on Potential Loyalists (42.6% of customers) — largest segment with highest ROI potential.
 
