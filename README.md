@@ -15,6 +15,8 @@ Olist is a Brazilian e-commerce marketplace platform that helps small retailers 
 Built Random Forest and XGBoost classifiers to predict customer churn using feature engineering across 5 tables in DuckDB. Initial models achieved ROC-AUC of 0.53 due to insufficient features. After engineering 4 additional behavioral sugnals (delivery delay, freight ratio, late delivery rate, purchase day of week), performance improved to ROC-AUC 0.706 (Random Forest) and 0.767 (XGBoost). SHAP analysis revealed delivery experience as the strongest churn predictor.
 ### 02 - Customer Segmentation (`notebooks/02_customer_segmentation.ipynb`)
 Applied RFM analysis and KMeans clustering to segment 93,358 customers. KMeans found mathematically valid clusters but since the data was in a way that clear segmentation was not compatible with the business model, I chose to pursue a manual RFM scoring.
+### 03 - Customer Value Scoring (`notebooks/03_customer_value_scoring.ipynb`)
+Built a Random Forest classifier to identify high-value customers based on first-order characteristics only. Achieved ROC-AUC of 0.98, but feature importance analysis revealed first_order_value dominates at 79%, a dataset artifact of the single-purchaes marketplace model where first order value equals lifetime value for 90% of customers. Documents the fundamental limitation of behavioral ML on this dataset.
 
 # Key Findings
 ## Churn Analysis Findings:
@@ -33,6 +35,12 @@ KMeans silhouette score was 0.37. Pure RFM clustering found mathematical cluster
 |Loyal Customers|37.8%|184 days |1.06      |$254     |
 |Potential Loyalist|42.6%|311 days| 1.01   |$130     |
 |At Risk|19%        |443 days   |1.00      |$57      |
+
+## Customer Value Scoring Findings
+- ROC-AUC of 0.98 achieved but driven by a single feature: first_order_value (79% importance)
+- Root cause: 90% of customers buy once, making first order value equivalent to lifetime value
+- Model is technically correct but adds minimal value beyond a simple threshold rule
+- Confirms dataset-wide finding: single-purchase marketplace limits predictive ML across all approaches
 
 # Business Recommendations
 - From Shap analysis: Delivery experience is the strongest predictor of customer retention. Sellers should prioritize on-time delivery over discounting strategies.
