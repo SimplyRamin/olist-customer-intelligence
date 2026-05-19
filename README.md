@@ -17,6 +17,18 @@ Built Random Forest and XGBoost classifiers to predict customer churn using feat
 Applied RFM analysis and KMeans clustering to segment 93,358 customers. KMeans found mathematically valid clusters but since the data was in a way that clear segmentation was not compatible with the business model, I chose to pursue a manual RFM scoring.
 ### 03 - Customer Value Scoring (`notebooks/03_customer_value_scoring.ipynb`)
 Built a Random Forest classifier to identify high-value customers based on first-order characteristics only. Achieved ROC-AUC of 0.98, but feature importance analysis revealed first_order_value dominates at 79%, a dataset artifact of the single-purchaes marketplace model where first order value equals lifetime value for 90% of customers. Documents the fundamental limitation of behavioral ML on this dataset.
+### 04 - Feature Engineering Pipeline (`olist_pipeline/`)
+Production-ready dbt pipeline that transforms raw Olist data into clean feature tables. Built with staging -> intermediate -> marts architecture. Includes 6 automated quality tests. Orchestrated with Prefect for scheduled execution.
+
+# Pipeline Architecture
+![dbt Lineage Graph](reports/dbt_lineage.png)
+
+The feature engineering pipeline follows the medallion architecture:
+- **Staging**: clean and standardize raw tables (stg_orders, stg_customers, stg_order_items)
+- **Intermediate**: join and enrich (int_customer_orders)
+- **Marts**: ML-ready feature table (customer_features)
+
+Orchestrated with Prefect - runs dbt transformations, executes data quality tests, and validates output row counts in sequence.
 
 # Key Findings
 ## Churn Analysis Findings:
@@ -69,6 +81,9 @@ I aim to add product category and delivery time features to enrich segmentation,
 - scikit-learn, XGBoost — modeling
 - KMeans, DBSCAN — clustering
 - TablePlus — SQL development
+- dbt-duckdb - SQL transformation pipeline
+- Prefect - pipeline orchestration
+- FastAPI - model serving (architecture defined)
 
 # How to Run
 1. Clone the repository
